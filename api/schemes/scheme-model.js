@@ -22,6 +22,7 @@ async function findById(scheme_id) { // EXERCISE B
       'st.step_number',
       'st.instructions'
     )
+
   const steps = []
   if (rows[0].step_id){
   rows.forEach((row) => {
@@ -51,64 +52,30 @@ async function findById(scheme_id) { // EXERCISE B
     on st.scheme_id = sc.scheme_id
     where sc.scheme_id = 2
     order by st.step_number;
-
-    2B- When you have a grasp on the query go ahead and build it in Knex
-    making it parametric: instead of a literal `1` you should use `scheme_id`.
-
-    3B- Test in Postman and see that the resulting data does not look like a scheme,
-    but more like an array of steps each including scheme information:
-
-      [
-        {
-          "scheme_id": 1,
-          "scheme_name": "World Domination",
-          "step_id": 2,
-          "step_number": 1,
-          "instructions": "solve prime number theory"
-        },
-        {
-          "scheme_id": 1,
-          "scheme_name": "World Domination",
-          "step_id": 1,
-          "step_number": 2,
-          "instructions": "crack cyber security"
-        },
-        // etc
-      ]
-
-    4B- Using the array obtained and vanilla JavaScript, create an object with
-    the structure below, for the case _when steps exist_ for a given `scheme_id`:
-
-      {
-        "scheme_id": 1,
-        "scheme_name": "World Domination",
-        "steps": [
-          {
-            "step_id": 2,
-            "step_number": 1,
-            "instructions": "solve prime number theory"
-          },
-          {
-            "step_id": 1,
-            "step_number": 2,
-            "instructions": "crack cyber security"
-          },
-          // etc
-        ]
-      }
-
-    5B- This is what the result should look like _if there are no steps_ for a `scheme_id`:
-
-      {
-        "scheme_id": 7,
-        "scheme_name": "Have Fun!",
-        "steps": []
-      }
   */
 
 
 function findSteps(scheme_id) { // EXERCISE C
+  const rows = db('steps as st')
+    .leftJoin('schemes as sc', 'st.scheme_id', '=', 'sc.scheme_id')
+    .where('sc.scheme_id', scheme_id)
+    .orderBy('st.step_number', 'asc')
+    .select('step_id', 'scheme_name', 'step_number', 'instructions')
+
+  return rows
   /*
+
+  select
+    step_id,
+    scheme_name,
+    step_number,
+    instructions
+from schemes as sc
+left join steps as st
+on st.scheme_id = sc.scheme_id
+where sc.scheme_id = 2
+order by step_number;
+
     1C- Build a query in Knex that returns the following data.
     The steps should be sorted by step_number, and the array
     should be empty if there are no steps for the scheme:
