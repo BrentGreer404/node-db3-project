@@ -8,47 +8,49 @@ async function find() { // EXERCISE A
     .orderBy('s.scheme_id', 'asc')
     .select('s.scheme_id', 's.scheme_name')
   return rows
-  /*
-      select
-      scheme_id,
-      scheme_name,
-      count(st.scheme_id) as number_of_steps
-  from steps as st
-  join schemes as s
-      on st.scheme_id = s.scheme_id
-  group by scheme_name
-  order by st.scheme_id;
-
-
-    1A- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`.
-    What happens if we change from a LEFT join to an INNER join?
-
-      SELECT
-          sc.*,
-          count(st.step_id) as number_of_steps
-      FROM schemes as sc
-      LEFT JOIN steps as st
-          ON sc.scheme_id = st.scheme_id
-      GROUP BY sc.scheme_id
-      ORDER BY sc.scheme_id ASC;
-
-    2A- When you have a grasp on the query go ahead and build it in Knex.
-    Return from this function the resulting dataset.
-  */
 }
 
-function findById(scheme_id) { // EXERCISE B
-  /*
-    1B- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`:
+async function findById(scheme_id) { // EXERCISE B
+  const rows = await db('schemes as sc')
+    .leftJoin('steps as st', 'st.scheme_id', '=', 'sc.scheme_id')
+    .orderBy('st.step_number', 'asc')
+    .where('sc.scheme_id', scheme_id)
+    .select(
+      'sc.scheme_id',
+      'sc.scheme_name',
+      'st.step_id',
+      'st.step_number',
+      'st.instructions'
+    )
+  const steps = []
+  if (rows[0].step_id){
+  rows.forEach((row) => {
+    steps.push( {
+      step_id: row.step_id,
+      step_number: row.step_number,
+      instructions: row.instructions
+    })
+  })}
 
-      SELECT
-          sc.scheme_name,
-          st.*
-      FROM schemes as sc
-      LEFT JOIN steps as st
-          ON sc.scheme_id = st.scheme_id
-      WHERE sc.scheme_id = 1
-      ORDER BY st.step_number ASC;
+  const result = {
+    scheme_id: parseInt(scheme_id),
+    scheme_name: rows[0].scheme_name,
+    steps: steps || []
+  }
+  return result
+}
+  /*
+    select
+    scheme_id,
+    scheme_name,
+    step_id,
+    step_number,
+    instructions
+    from schemes as sc
+    left join steps as st
+    on st.scheme_id = sc.scheme_id
+    where sc.scheme_id = 2
+    order by st.step_number;
 
     2B- When you have a grasp on the query go ahead and build it in Knex
     making it parametric: instead of a literal `1` you should use `scheme_id`.
@@ -103,7 +105,7 @@ function findById(scheme_id) { // EXERCISE B
         "steps": []
       }
   */
-}
+
 
 function findSteps(scheme_id) { // EXERCISE C
   /*

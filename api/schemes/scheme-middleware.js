@@ -8,8 +8,13 @@ const db = require('../../data/db-config')
     "message": "scheme with scheme_id <actual id> not found"
   }
 */
-const checkSchemeId = (req, res, next) => {
-
+const checkSchemeId = async (req, res, next) => {
+  const id = await db('schemes').where('scheme_id', req.params.scheme_id).first()
+  if (id){
+    next()
+  } else {
+    next({status: 404, message: `scheme with scheme_id ${req.params.scheme_id} not found`})
+  }
 }
 
 /*
@@ -21,7 +26,7 @@ const checkSchemeId = (req, res, next) => {
   }
 */
 const validateScheme = (req, res, next) => {
-
+  next()
 }
 
 /*
@@ -34,7 +39,7 @@ const validateScheme = (req, res, next) => {
   }
 */
 const validateStep = (req, res, next) => {
-
+  next()
 }
 
 module.exports = {
