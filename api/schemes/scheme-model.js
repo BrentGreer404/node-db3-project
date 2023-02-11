@@ -79,7 +79,6 @@ order by step_number;
 }
 
 async function add(scheme) { // EXERCISE D
-  console.log(scheme)
   await db('schemes')
   .insert(scheme)
 
@@ -92,7 +91,12 @@ async function add(scheme) { // EXERCISE D
   */
 }
 
-function addStep(scheme_id, step) { // EXERCISE E
+async function addStep(scheme_id, step) { // EXERCISE E
+  step.scheme_id = scheme_id
+  await db('steps')
+  .insert(step)
+
+  return findSteps(scheme_id)
   /*
     1E- This function adds a step to the scheme with the given `scheme_id`
     and resolves to _all the steps_ belonging to the given `scheme_id`,

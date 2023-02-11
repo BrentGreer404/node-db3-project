@@ -45,7 +45,17 @@ const validateScheme = (req, res, next) => {
   }
 */
 const validateStep = (req, res, next) => {
-  next()
+  const { instructions, step_number } = req.body
+  if (instructions && 
+    typeof instructions === "string" && 
+    instructions.length &&
+    !isNaN(step_number) &&
+    step_number >= 1){
+      next()
+    } else {
+      next({status:400, message: "invalid step"})
+    }
+  
 }
 
 module.exports = {
